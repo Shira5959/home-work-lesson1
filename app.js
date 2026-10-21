@@ -2,19 +2,19 @@ const express = require('express');
 const app = express();  
 
 app.use(express.json());
-const {books,borrowings}=require("./db")
+const {books}=require("./db")
 const port=3000
 app.get('/', (req, res) => {
     res.send('Hello World!');
 }   );
 
 app.get('/books', (req, res) => {
-    res.send(book);
+    res.send(books);
 });
 
 app.get('/books/:code', (req, res) => {
     const code = parseInt(req.params.code);
-    const bookItem = book.find(b => b.code === code);
+    const bookItem = books.find(b => b.code === code);
     if (bookItem) {
         res.send(bookItem);     
     } else {
@@ -22,8 +22,8 @@ app.get('/books/:code', (req, res) => {
     }
 });
 
-app.listen(5000, () => {
-    console.log('Server is running on port 5000');
+app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
 });
 
 app.post('/books',(req,res)=>{
@@ -31,10 +31,10 @@ app.post('/books',(req,res)=>{
     if(!bookToAdd.name||!bookToAdd.category||!bookToAdd.price)
         res.status(400).json({message:"You need to enter all the details of the book."})
     else{
-        if(!bookToAdd.IsBorrowed)
-            bookToAdd.IsBorrowed=false
-        let bookId=books[books.length-1].id+1
-        let newBook={id:bookId, ...bookToAdd}
+        if(!bookToAdd.isBorrowed)
+             bookToAdd.isBorrowed=false
+        let bookCode=books[books.length-1].code+1
+        let newBook={code:bookCode, ...bookToAdd}
         books.push(newBook)
         res.status(201).json(books)
     }
@@ -43,10 +43,10 @@ app.post('/books',(req,res)=>{
 app.put('/books/:code', (req, res) => {
     const code = parseInt(req.params.code);
     const updatedBook = req.body;
-    const index = book.findIndex(b => b.code === code); 
+    const index = books.findIndex(b => b.code === code); 
     if (index !== -1) {
-        book[index] = { ...book[index], ...updatedBook };
-        res.send(book[index]);
+        books[index] = { ...books[index], ...updatedBook };
+        res.send(books[index]);
     } else {
         res.status(404).send({ message: 'Book not found' });
     }
@@ -54,11 +54,11 @@ app.put('/books/:code', (req, res) => {
 
 app.patch('/books/:code/borrow', (req, res) => {
     const code = parseInt(req.params.code);
-    const { borrowed } = req.body;
-    const index = book.findIndex(b => b.code === code);
+    const { isBorrowed } = req.body;
+    const index = books.findIndex(b => b.code === code);
     if (index !== -1) {
-        book[index].borrowed = borrowed;
-        res.send(book[index]);
+        books[index].isBorrowed = isBorrowed;
+        res.send(books[index]);
     } else {
         res.status(404).send({ message: 'Book not found' });
     }
@@ -66,11 +66,11 @@ app.patch('/books/:code/borrow', (req, res) => {
 
 app.patch('/books/:code/return', (req, res) => {
     const code = parseInt(req.params.code);
-    const index = book.findIndex(b => b.code === code); 
+    const index = books.findIndex(b => b.code === code); 
     if (index !== -1) {
-        book[index].isBorrowed = false;
-        book[index].borrowedBy = null;
-        res.send(book[index]);
+        books[index].isBorrowed = false;
+        books[index].borrowedBy = null;
+        res.send(books[index]);
     } else {    
     res.status(404).send({ message: 'Book not found' });
     }
@@ -78,9 +78,9 @@ app.patch('/books/:code/return', (req, res) => {
 
 app.delete('/books/:code', (req, res) => {
     const code = parseInt(req.params.code);
-    const index = book.findIndex(b => b.code === code); 
+    const index = books.findIndex(b => b.code === code); 
     if (index !== -1) {
-        const deletedBook = book.splice(index, 1);
+        const deletedBook = books.splice(index, 1);
         res.send(deletedBook[0]);
     } else {
         res.status(404).send({ message: 'Book not found' });
