@@ -4,4 +4,4 @@ const users = [
     { code: 103, username: "user3", email: "user3@gmail.com", password: "abcd", borrowedBooks: [] }
 ];
 
-module.exports = { books, users };
+module.exports = { users };

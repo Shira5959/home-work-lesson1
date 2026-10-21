@@ -10,11 +10,19 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
   "dependencies": {
     "express": "^5.2.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/s0548595944-ux/home-work-lesson1.git"
+  },
+  "bugs": {
+    "url": "https://github.com/s0548595944-ux/home-work-lesson1/issues"
+  },
+  "homepage": "https://github.com/s0548595944-ux/home-work-lesson1#readme",
+  "description": ""
 }
