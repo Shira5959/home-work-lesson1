@@ -5,20 +5,24 @@ const getAll = (req, res) => {
     res.send(books);
 };
 
-const getByCode = (req, res) => {
+const getByCode = (req, res, next) => {
     const code = parseInt(req.params.code);
     const bookItem = books.find(b => b.code === code);
     if (bookItem) {
         res.send(bookItem);
     } else {
-        res.status(404).send({ message: 'Book not found' });
+        const err = new Error('Book not found');
+        err.status = 404;
+        return next(err);
     }
 };
 
-const add = (req, res) => {
+const add = (req, res, next) => {
     const bookToAdd = req.body;
     if (!bookToAdd.name || !bookToAdd.category || !bookToAdd.price) {
-        return res.status(400).json({ message: 'You need to enter all the details of the book.' });
+        const err = new Error('You need to enter all the details of the book.');
+        err.status = 400;
+        return next(err);
     }
     const bookCode = books.length ? books[books.length - 1].code + 1 : 1;
     const newBook = {
@@ -33,29 +37,41 @@ const add = (req, res) => {
     res.status(201).json(newBook);
 };
 
-const update = (req, res) => {
+const update = (req, res, next) => {
     const code = parseInt(req.params.code);
     const index = books.findIndex(b => b.code === code);
     if (index !== -1) {
         books[index] = { ...books[index], ...req.body, code: books[index].code };
         res.send(books[index]);
     } else {
-        res.status(404).send({ message: 'Book not found' });
+        const err = new Error('Book not found');
+        err.status = 404;
+        return next(err);
     }
 };
 
-const borrow = (req, res) => {
+const borrow = (req, res, next) => {
     const code = parseInt(req.params.code);
     const { userCode } = req.body;
 
     const book = books.find(b => b.code === code);
-    if (!book) return res.status(404).send({ message: 'Book not found' });
+    if (!book) {
+        const err = new Error('Book not found');
+        err.status = 404;
+        return next(err);
+    }
 
     const user = users.find(u => u.code === userCode);
-    if (!user) return res.status(404).send({ message: 'User not found' });
+    if (!user) {
+        const err = new Error('User not found');
+        err.status = 404;
+        return next(err);
+    }
 
     if (book.isBorrowed) {
-        return res.status(400).send({ message: 'Book is already borrowed' });
+        const err = new Error('Book is already borrowed');
+        err.status = 400;
+        return next(err);
     }
 
     book.isBorrowed = true;
@@ -65,14 +81,20 @@ const borrow = (req, res) => {
     res.send(book);
 };
 
-const giveBack = (req, res) => {
+const giveBack = (req, res, next) => {
     const code = parseInt(req.params.code);
 
     const book = books.find(b => b.code === code);
-    if (!book) return res.status(404).send({ message: 'Book not found' });
+    if (!book) {
+        const err = new Error('Book not found');
+        err.status = 404;
+        return next(err);
+    }
 
     if (!book.isBorrowed) {
-        return res.status(400).send({ message: 'Book is not borrowed' });
+        const err = new Error('Book is not borrowed');
+        err.status = 400;
+        return next(err);
     }
 
     const user = users.find(u => u.code === book.borrowedBy.code);
@@ -86,14 +108,16 @@ const giveBack = (req, res) => {
     res.send(book);
 };
 
-const remove = (req, res) => {
+const remove = (req, res, next) => {
     const code = parseInt(req.params.code);
     const index = books.findIndex(b => b.code === code);
     if (index !== -1) {
         const deletedBook = books.splice(index, 1);
         res.send(deletedBook[0]);
     } else {
-        res.status(404).send({ message: 'Book not found' });
+        const err = new Error('Book not found');
+        err.status = 404;
+        return next(err);
     }
 };
 
