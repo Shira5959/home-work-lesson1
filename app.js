@@ -7,6 +7,7 @@ const addCurrentDate = require('./middlewares/currentDate.middleware');
 const printDateOnGet = require('./middlewares/printDate.middleware');
 const notFound = require('./middlewares/notFound.middleware');
 const errorHandler = require('./middlewares/errorHandler.middleware');
+const connectDB = require('./config/db');
 
 const app = express();
 const port = 3000;
@@ -28,6 +29,8 @@ app.use('/users', userRouter);
 
 app.use(notFound);
 app.use(errorHandler);
+
+connectDB();
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
