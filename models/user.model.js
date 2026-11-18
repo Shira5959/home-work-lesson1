@@ -32,7 +32,8 @@ const userSchema = new mongoose.Schema({
     borrows: [{
         code: String,
         name: String
-    }]
+    }],
+    role: { type: String, enum: ['user', 'admin'], default: 'user' }
 });
 
 userSchema.pre('save', async function () {
