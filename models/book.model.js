@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Joi = require('joi');
 
 const bookSchema = new mongoose.Schema({
     name: {
@@ -23,7 +24,29 @@ const bookSchema = new mongoose.Schema({
         name: String,
         phone: String,
         email: String
-    }
+    },
+    image: String
 });
 
-module.exports = mongoose.model('Book', bookSchema);
+const createBookJoi = Joi.object({
+    name: Joi.string().trim().min(2).max(100).required(),
+    price: Joi.number().min(0).required(),
+    categories: Joi.array().items(Joi.string().trim().min(2)).min(1).required(),
+    supplier: Joi.object({
+        name: Joi.string().min(2),
+        phone: Joi.string().pattern(/^0(5\d|7\d|[2-4]|[8-9])-?\d{7}$/),
+        email: Joi.string().email()
+    })
+});
+
+const bookJoi = {
+    create: createBookJoi,
+    update: createBookJoi
+        .fork(['name', 'price', 'categories'], (field) => field.optional())
+        .min(1)
+};
+
+const Book = mongoose.model('Book', bookSchema);
+
+module.exports = Book;
+module.exports.bookJoi = bookJoi;

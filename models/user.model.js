@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const Joi = require('joi');
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -58,4 +59,30 @@ userSchema.set('toJSON', {
     }
 });
 
-module.exports = mongoose.model('User', userSchema);
+const phonePattern = /^0(5\d|7\d|[2-4]|[8-9])-?\d{7}$/;
+
+const userJoi = {
+    register: Joi.object({
+        name: Joi.string().trim().min(2).max(50).required(),
+        email: Joi.string().email().required(),
+        phone: Joi.string().pattern(phonePattern).required(),
+        password: Joi.string().min(4).required()
+    }),
+    login: Joi.object({
+        email: Joi.string().email().required(),
+        password: Joi.string().required()
+    }),
+    update: Joi.object({
+        name: Joi.string().trim().min(2).max(50),
+        email: Joi.string().email(),
+        phone: Joi.string().pattern(phonePattern)
+    }).min(1),
+    borrow: Joi.object({
+        bookId: Joi.string().hex().length(24).required()
+    })
+};
+
+const User = mongoose.model('User', userSchema);
+
+module.exports = User;
+module.exports.userJoi = userJoi;

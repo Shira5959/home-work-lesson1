@@ -67,4 +67,27 @@ const remove = async (req, res, next) => {
     }
 };
 
-module.exports = { getAll, getById, add, update, remove };
+const uploadImage = async (req, res, next) => {
+    try {
+        if (!req.file) {
+            const err = new Error('No image uploaded');
+            err.status = 400;
+            return next(err);
+        }
+        const book = await Book.findByIdAndUpdate(
+            req.params.id,
+            { image: req.file.filename },
+            { new: true }
+        );
+        if (!book) {
+            const err = new Error('Book not found');
+            err.status = 404;
+            return next(err);
+        }
+        res.send(book);
+    } catch (err) {
+        if (err.name === 'CastError') err.status = 400;
+        next(err);
+    }
+};
+module.exports = { getAll, getById, add, update, remove, uploadImage  };
